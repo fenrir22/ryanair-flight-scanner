@@ -4,9 +4,12 @@ import type { FlightResult } from '../../types'
 interface FlightCardProps {
   result: FlightResult
   rank?: number
+  selectable?: boolean
+  selected?: boolean
+  onToggleSelect?: () => void
 }
 
-export const FlightCard: React.FC<FlightCardProps> = ({ result, rank }) => {
+export const FlightCard: React.FC<FlightCardProps> = ({ result, rank, selectable, selected, onToggleSelect }) => {
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr + 'T00:00:00')
     return d.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })
@@ -35,13 +38,47 @@ export const FlightCard: React.FC<FlightCardProps> = ({ result, rank }) => {
   const isOneWay = result.tripType === 'one-way'
 
   return (
-    <div className={`relative group card-hover-effect rounded-2xl overflow-hidden animate-slide-in ${
-      rank === 1 ? 'ring-2 ring-ryanair-yellow/50 shadow-glow' : ''
-    }`}>
+    <div 
+      onClick={selectable ? onToggleSelect : undefined}
+      className={`relative group card-hover-effect rounded-2xl overflow-hidden animate-slide-in transition-all duration-200 ${
+        rank === 1 ? 'ring-2 ring-ryanair-yellow/50 shadow-glow' : ''
+      } ${
+        selected 
+          ? 'ring-2 ring-blue-500 shadow-lg scale-[1.02]' 
+          : selectable ? 'cursor-pointer hover:ring-2 hover:ring-blue-300/50' : ''
+      }`}
+    >
       {/* Background gradiente */}
       <div className="absolute inset-0 dark:from-gray-900/95 dark:to-gray-800/95 from-white to-gray-50 backdrop-blur-xl"></div>
       <div className="absolute inset-0 border dark:border-white/10 border-gray-200 rounded-2xl group-hover:border-ryanair-yellow/20 transition-colors"></div>
       
+      {/* Overlay selezione */}
+      {selected && (
+        <div className="absolute inset-0 bg-blue-500/5 dark:bg-blue-400/10 rounded-2xl pointer-events-none"></div>
+      )}
+
+      {/* Badge selezione */}
+      {selectable && (
+        <>
+          {/* Hint hover */}
+          {!selected && (
+            <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <div className="px-2 py-1 rounded-lg dark:bg-gray-700/90 bg-gray-200/90 text-xs dark:text-gray-300 text-gray-600 font-medium shadow-lg">
+                Clicca per selezionare
+              </div>
+            </div>
+          )}
+          {/* Badge selezionato */}
+          <div className={`absolute top-3 right-3 z-10 transition-all duration-200 ${
+            selected ? 'scale-100' : 'scale-0 group-hover:scale-0'
+          }`}>
+            <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-sm shadow-lg">
+              ✓
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Badge miglior prezzo */}
       {rank === 1 && (
         <div className="absolute top-0 right-0">

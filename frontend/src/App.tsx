@@ -1,7 +1,9 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import type { SearchRequest } from './types'
 import { SearchForm } from './components/search/SearchForm'
 import { SavedSearches } from './components/search/SavedSearches'
+import { SearchHistory } from './components/search/SearchHistory'
+import { PriceAlertManager } from './components/search/PriceAlertManager'
 import { ProgressBar } from './components/results/ProgressBar'
 import { ResultsList } from './components/results/ResultsList'
 import { PriceChart } from './components/charts/PriceChart'
@@ -10,12 +12,20 @@ import { FlightMap } from './components/charts/FlightMap'
 import { PriceHistoryChart } from './components/charts/PriceHistoryChart'
 import { ExportCSV } from './components/results/ExportCSV'
 import { ShareResults } from './components/results/ShareResults'
+import { ResultsSkeleton } from './components/ui/Skeleton'
+import { KeyboardShortcutsHelp } from './components/ui/KeyboardShortcutsHelp'
 import { useSearch } from './hooks/useSearch'
 import { useTheme } from './hooks/useTheme'
+import { useSearchHistory } from './hooks/useSearchHistory'
+import { usePriceAlert } from './hooks/usePriceAlert'
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
+import type { SearchHistoryEntry } from './hooks/useSearchHistory'
 
 const App: React.FC = () => {
   const { search, cancel, progress, results, isSearching, error } = useSearch()
   const { theme, toggleTheme } = useTheme()
+  const { history, addToHistory, removeFromHistory, clearHistory } = useSearchHistory()
+  const { alerts, permissionGranted, requestPermission, addAlert, removeAlert, checkAlerts, resetAlert } = usePriceAlert()
   const [lastRequest, setLastRequest] = useState<SearchRequest | null>(null)
   const [showChart, setShowChart] = useState(false)
   const [showCalendar, setShowCalendar] = useState(false)
@@ -26,6 +36,43 @@ const App: React.FC = () => {
     setLastRequest(request)
     search(request)
   }, [search])
+
+  const handleSearchComplete = useCallback(() => {
+    if (lastRequest && results.length > 0) {
+      addToHistory(lastRequest, results.length)
+    }
+  }, [lastRequest, results, addToHistory])
+
+  const handleHistorySelect = useCallback((entry: SearchHistoryEntry) => {
+    setLastRequest(entry.request)
+    search(entry.request)
+  }, [search])
+
+  useEffect(() => {
+    if (progress?.status === 'completed' && results.length > 0) {
+      handleSearchComplete()
+      checkAlerts(results)
+    }
+  }, [progress?.status, results.length, handleSearchComplete, checkAlerts])
+
+  useKeyboardShortcuts([
+    {
+      key: '?',
+      action: () => document.querySelector('[aria-label="Scorciatoie tastiera"]')?.dispatchEvent(new MouseEvent('click', { bubbles: true })),
+      description: 'Mostra aiuto scorciatoie'
+    },
+    {
+      key: 'Escape',
+      action: () => {
+        const openModal = document.querySelector('.fixed.inset-0')
+        if (openModal) {
+          const closeBtn = openModal.querySelector('[aria-label="Chiudi"]') as HTMLButtonElement
+          closeBtn?.click()
+        }
+      },
+      description: 'Chiudi modali'
+    }
+  ])
 
   const handleRefresh = useCallback(() => {
     if (lastRequest) {
@@ -69,6 +116,7 @@ const App: React.FC = () => {
             )}
 
             {/* Theme toggle */}
+            <KeyboardShortcutsHelp />
             <button
               onClick={toggleTheme}
               className="button-secondary p-2 rounded-xl"
@@ -99,6 +147,32 @@ const App: React.FC = () => {
           <SavedSearches userId="default" />
         </div>
 
+        {/* Cronologia ricerche */}
+        {history.length > 0 && !isSearching && results.length === 0 && (
+          <div className="animate-fade-in" style={{ animationDelay: '0.15s' }}>
+            <SearchHistory
+              history={history}
+              onSelect={handleHistorySelect}
+              onRemove={removeFromHistory}
+              onClear={clearHistory}
+            />
+          </div>
+        )}
+
+        {/* Alert prezzo */}
+        {!isSearching && results.length === 0 && (
+          <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <PriceAlertManager
+              alerts={alerts}
+              permissionGranted={permissionGranted}
+              onAdd={addAlert}
+              onRemove={removeAlert}
+              onRequestPermission={requestPermission}
+              onReset={resetAlert}
+            />
+          </div>
+        )}
+
         {/* Errori */}
         {error && (
           <div className="animate-slide-up bg-red-500/10 border border-red-500/20 rounded-2xl p-4 backdrop-blur-sm">
@@ -120,6 +194,13 @@ const App: React.FC = () => {
         {progress && progress.status !== 'pending' && (
           <div className="animate-slide-up">
             <ProgressBar progress={progress} onCancel={cancel} />
+          </div>
+        )}
+
+        {/* Skeleton loading */}
+        {isSearching && results.length === 0 && (
+          <div className="animate-fade-in">
+            <ResultsSkeleton count={4} />
           </div>
         )}
 

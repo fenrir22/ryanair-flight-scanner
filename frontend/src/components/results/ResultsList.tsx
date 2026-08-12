@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import type { FlightResult, SortOption } from '../../types'
 import { FlightCard } from './FlightCard'
+import { FlightCompareModal } from './FlightCompareModal'
 
 interface ResultsListProps {
   results: FlightResult[]
@@ -23,6 +24,8 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
   const [sortBy, setSortBy] = useState<SortOption>('cheapest')
   const [filterAirport, setFilterAirport] = useState<string>('')
   const [showFilters, setShowFilters] = useState(false)
+  const [selectedFlights, setSelectedFlights] = useState<Set<string>>(new Set())
+  const [showCompare, setShowCompare] = useState(false)
   const [filters, setFilters] = useState<Filters>({
     priceMin: null,
     priceMax: null,
@@ -179,6 +182,26 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
     if (filterAirport) count++
     return count
   }, [filters, filterAirport])
+
+  const getFlightKey = (result: FlightResult) => 
+    `${result.origin}-${result.destination}-${result.departureDate}-${result.returnDate}`
+
+  const toggleFlightSelection = (result: FlightResult) => {
+    const key = getFlightKey(result)
+    setSelectedFlights(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(key)) {
+        newSet.delete(key)
+      } else {
+        newSet.add(key)
+      }
+      return newSet
+    })
+  }
+
+  const selectedFlightsList = useMemo(() => {
+    return filteredAndSorted.filter(r => selectedFlights.has(getFlightKey(r)))
+  }, [filteredAndSorted, selectedFlights])
 
   return (
     <div className="space-y-6">
@@ -445,15 +468,69 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
         <span className="text-xs text-yellow-500/80">I prezzi dei voli possono cambiare</span>
       </div>
 
+      {/* Barra confronto - sticky bottom */}
+      {selectedFlights.size >= 2 && (
+        <div className="sticky bottom-4 z-30 mt-6">
+          <div className="relative overflow-hidden rounded-2xl shadow-2xl">
+            <div className="absolute inset-0 dark:bg-gray-800 bg-white border-2 dark:border-blue-500/50 border-blue-500"></div>
+            <div className="relative p-5 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex -space-x-2">
+                  {Array.from(selectedFlights).slice(0, 3).map((_, idx) => (
+                    <div key={idx} className="w-10 h-10 rounded-full bg-blue-500 border-2 dark:border-gray-800 border-white flex items-center justify-center text-white font-bold text-sm">
+                      {idx + 1}
+                    </div>
+                  ))}
+                  {selectedFlights.size > 3 && (
+                    <div className="w-10 h-10 rounded-full dark:bg-gray-700 bg-gray-200 border-2 dark:border-gray-800 border-white flex items-center justify-center dark:text-gray-300 text-gray-600 font-bold text-sm">
+                      +{selectedFlights.size - 3}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="text-base font-bold dark:text-white text-gray-900">
+                    {selectedFlights.size} vol{selectedFlights.size === 1 ? 'o' : 'i'} selezionat{selectedFlights.size === 1 ? 'o' : 'i'}
+                  </p>
+                  <p className="text-xs dark:text-gray-400 text-gray-600">Clicca per confrontare</p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setSelectedFlights(new Set())}
+                  className="px-5 py-2.5 rounded-xl text-sm font-semibold dark:bg-gray-700 bg-gray-200 dark:text-gray-300 text-gray-700 hover:dark:bg-gray-600 hover:bg-gray-300 transition-colors"
+                >
+                  Annulla
+                </button>
+                <button
+                  onClick={() => setShowCompare(true)}
+                  className="px-6 py-2.5 rounded-xl text-sm font-bold bg-blue-500 text-white hover:bg-blue-600 transition-colors flex items-center gap-2 shadow-lg"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                  Confronta
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Lista risultati */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {filteredAndSorted.map((result, index) => (
-          <FlightCard
-            key={`${result.origin}-${result.destination}-${result.departureDate}-${result.returnDate}`}
-            result={result}
-            rank={index === 0 ? 1 : undefined}
-          />
-        ))}
+        {filteredAndSorted.map((result, index) => {
+          const key = getFlightKey(result)
+          return (
+            <FlightCard
+              key={key}
+              result={result}
+              rank={index === 0 ? 1 : undefined}
+              selectable={true}
+              selected={selectedFlights.has(key)}
+              onToggleSelect={() => toggleFlightSelection(result)}
+            />
+          )
+        })}
       </div>
 
       {/* Nessun risultato */}
@@ -472,6 +549,14 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
             <p className="dark:text-gray-600 text-gray-400 text-sm mt-2">Prova a modificare i criteri di ricerca</p>
           </div>
         </div>
+      )}
+
+      {/* Modale confronto */}
+      {showCompare && selectedFlightsList.length >= 2 && (
+        <FlightCompareModal
+          flights={selectedFlightsList}
+          onClose={() => setShowCompare(false)}
+        />
       )}
     </div>
   )

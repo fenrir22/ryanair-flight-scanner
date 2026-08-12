@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import type { SavedSearch } from '../../types'
 import { getSavedSearches, createSavedSearch, deleteSavedSearch, updateSavedSearch } from '../../api/savedSearches'
 import { AirportAutocomplete } from '../search/AirportAutocomplete'
+import { SavedSearchImportExport } from './SavedSearchImportExport'
 import { useAirportSearch } from '../../hooks/useAirportSearch'
 
 interface SavedSearchesProps {
@@ -60,13 +61,28 @@ export const SavedSearches: React.FC<SavedSearchesProps> = ({ userId }) => {
     }
   }
 
+  const handleImport = async (importedSearches: SavedSearch[]) => {
+    try {
+      const newSearches: SavedSearch[] = []
+      for (const search of importedSearches) {
+        const { id, created_at, updated_at, ...searchData } = search
+        const created = await createSavedSearch(searchData)
+        newSearches.push(created)
+      }
+      setSearches(prev => [...prev, ...newSearches])
+    } catch (err) {
+      console.error('Failed to import searches:', err)
+      throw err
+    }
+  }
+
   if (loading) {
     return <div className="dark:text-gray-400 text-gray-600">Caricamento ricerche salvate...</div>
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-ryanair-yellow/10 flex items-center justify-center">
             <svg className="w-5 h-5 text-ryanair-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,26 +94,29 @@ export const SavedSearches: React.FC<SavedSearchesProps> = ({ userId }) => {
             <p className="text-xs dark:text-gray-500 text-gray-500">Ricevi notifiche per le migliori offerte</p>
           </div>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="button-primary px-4 py-2 rounded-xl text-sm flex items-center gap-2"
-        >
-          {showForm ? (
-            <>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-              Annulla
-            </>
-          ) : (
-            <>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
-              </svg>
-              Nuova Ricerca
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+          <SavedSearchImportExport searches={searches} onImport={handleImport} />
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="button-primary px-4 py-2 rounded-xl text-sm flex items-center gap-2"
+          >
+            {showForm ? (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                Annulla
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
+                </svg>
+                Nuova Ricerca
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {showForm && (
