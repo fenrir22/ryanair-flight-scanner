@@ -35,7 +35,7 @@ export const AirportAutocomplete: React.FC<AirportAutocompleteProps> = ({
 
   return (
     <div className="relative">
-      <label className="flex items-center gap-2 text-sm font-medium text-gray-400 mb-2">
+      <label className="flex items-center gap-2 text-sm font-medium dark:text-gray-400 text-gray-600 mb-2">
         {icon}
         {label}
         {selected.length > 0 && (
@@ -56,7 +56,7 @@ export const AirportAutocomplete: React.FC<AirportAutocompleteProps> = ({
               <span className="font-mono font-bold text-ryanair-yellow">{code}</span>
               <button
                 onClick={() => onRemove(code)}
-                className="text-gray-500 hover:text-red-400 transition-colors"
+                className="dark:text-gray-500 text-gray-400 hover:text-red-400 transition-colors"
                 aria-label={`Rimuovi ${code}`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,7 +81,7 @@ export const AirportAutocomplete: React.FC<AirportAutocompleteProps> = ({
           onFocus={() => setIsOpen(true)}
           onBlur={() => setTimeout(() => setIsOpen(false), 200)}
           placeholder={dynamicPlaceholder}
-          className="input-modern w-full px-4 py-3 rounded-xl text-gray-100 placeholder-gray-500 text-sm"
+          className="input-modern w-full px-4 py-3 rounded-xl dark:text-gray-100 text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 text-sm"
         />
         {isSearching && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -95,10 +95,10 @@ export const AirportAutocomplete: React.FC<AirportAutocompleteProps> = ({
 
       {/* Dropdown risultati */}
       {isOpen && searchQuery.length >= 2 && (
-        <div className="absolute z-50 w-full mt-2 bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-card overflow-hidden animate-slide-up">
+        <div className="absolute z-50 w-full mt-2 dark:bg-gray-900/95 bg-white/95 backdrop-blur-xl border dark:border-white/10 border-gray-200 rounded-xl shadow-card overflow-hidden animate-slide-up">
           <div className="max-h-64 overflow-y-auto">
             {!isSearching && searchResults.length === 0 && (
-              <div className="px-4 py-3 text-gray-500 text-sm text-center">
+              <div className="px-4 py-3 dark:text-gray-500 text-gray-400 text-sm text-center">
                 Nessun aeroporto trovato
               </div>
             )}
@@ -108,22 +108,21 @@ export const AirportAutocomplete: React.FC<AirportAutocompleteProps> = ({
                 onClick={() => {
                   onAdd(airport.code)
                   setSearchQuery('')
-                  // Mantieni il dropdown aperto e il focus sull'input
                   setTimeout(() => {
                     inputRef.current?.focus()
                   }, 0)
                 }}
                 disabled={selected.includes(airport.code)}
-                className="w-full text-left px-4 py-3 hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed text-sm border-b border-white/5 last:border-0 transition-colors flex items-center gap-3"
+                className="w-full text-left px-4 py-3 dark:hover:bg-white/5 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed text-sm border-b dark:border-white/5 border-gray-100 last:border-0 transition-colors flex items-center gap-3"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <span className="font-mono font-bold text-ryanair-yellow text-base">{airport.code}</span>
                 <div className="flex-1 min-w-0">
-                  <div className="text-gray-200 truncate">{airport.name}</div>
-                  <div className="text-gray-500 text-xs">{airport.cityName}</div>
+                  <div className="dark:text-gray-200 text-gray-800 truncate">{airport.name}</div>
+                  <div className="dark:text-gray-500 text-gray-500 text-xs">{airport.cityName}</div>
                 </div>
                 {selected.includes(airport.code) && (
-                  <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 dark:text-gray-600 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
                   </svg>
                 )}

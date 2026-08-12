@@ -36,8 +36,8 @@ export const PriceChart: React.FC<PriceChartProps> = ({ results }) => {
   return (
     <div className="relative overflow-hidden rounded-2xl">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl"></div>
-      <div className="absolute inset-0 border border-white/10 rounded-2xl"></div>
+      <div className="absolute inset-0 dark:from-gray-900/95 dark:to-gray-800/95 from-white to-gray-50 backdrop-blur-xl"></div>
+      <div className="absolute inset-0 border dark:border-white/10 border-gray-200 rounded-2xl"></div>
       
       <div className="relative p-6">
         {/* Header */}
@@ -48,8 +48,8 @@ export const PriceChart: React.FC<PriceChartProps> = ({ results }) => {
             </svg>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white">Prezzi per data di partenza</h3>
-            <p className="text-xs text-gray-500">Andamento dei prezzi minimi e medi</p>
+            <h3 className="text-lg font-semibold dark:text-white text-gray-900">Prezzi per data di partenza</h3>
+            <p className="text-xs dark:text-gray-500 text-gray-500">Andamento dei prezzi minimi e medi</p>
           </div>
         </div>
 
@@ -119,11 +119,11 @@ export const PriceChart: React.FC<PriceChartProps> = ({ results }) => {
         <div className="flex items-center justify-center gap-6 mt-4">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-ryanair-yellow"></div>
-            <span className="text-xs text-gray-400">Prezzo minimo</span>
+            <span className="text-xs dark:text-gray-400 text-gray-600">Prezzo minimo</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-0.5 bg-ryanair-blue" style={{ backgroundImage: 'repeating-linear-gradient(90deg, #073590 0, #073590 5px, transparent 5px, transparent 10px)' }}></div>
-            <span className="text-xs text-gray-400">Prezzo medio</span>
+            <span className="text-xs dark:text-gray-400 text-gray-600">Prezzo medio</span>
           </div>
         </div>
       </div>

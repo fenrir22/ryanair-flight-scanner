@@ -42,6 +42,21 @@ db.exec(`
     message TEXT,
     FOREIGN KEY (search_id) REFERENCES saved_searches(id)
   );
+
+  CREATE TABLE IF NOT EXISTS price_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    origin TEXT NOT NULL,
+    destination TEXT NOT NULL,
+    departure_date TEXT NOT NULL,
+    return_date TEXT,
+    min_price REAL NOT NULL,
+    avg_price REAL NOT NULL,
+    currency TEXT NOT NULL DEFAULT 'EUR',
+    recorded_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_price_history_route ON price_history(origin, destination);
+  CREATE INDEX IF NOT EXISTS idx_price_history_dates ON price_history(departure_date, return_date);
 `)
 
 export interface SavedSearch {
@@ -161,6 +176,55 @@ export function deleteSavedSearch(id: string): boolean {
 export function recordNotification(searchId: string, price: number | null, message: string): void {
   const stmt = db.prepare('INSERT INTO notifications (search_id, price, message) VALUES (?, ?, ?)')
   stmt.run(searchId, price, message)
+}
+
+export interface PriceHistoryEntry {
+  origin: string
+  destination: string
+  departure_date: string
+  return_date: string | null
+  min_price: number
+  avg_price: number
+  currency: string
+  recorded_at: string
+}
+
+export function recordPriceHistory(entries: Omit<PriceHistoryEntry, 'recorded_at'>[]): void {
+  const stmt = db.prepare(`
+    INSERT INTO price_history (origin, destination, departure_date, return_date, min_price, avg_price, currency, recorded_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
+  `)
+  
+  const insertMany = db.transaction((items: Omit<PriceHistoryEntry, 'recorded_at'>[]) => {
+    for (const entry of items) {
+      stmt.run(entry.origin, entry.destination, entry.departure_date, entry.return_date, entry.min_price, entry.avg_price, entry.currency)
+    }
+  })
+  
+  insertMany(entries)
+}
+
+export function getPriceHistory(
+  origin: string,
+  destination: string,
+  days: number = 30
+): PriceHistoryEntry[] {
+  const stmt = db.prepare(`
+    SELECT * FROM price_history 
+    WHERE origin = ? AND destination = ? 
+    AND recorded_at >= datetime('now', '-' || ? || ' days')
+    ORDER BY recorded_at ASC
+  `)
+  return stmt.all(origin, destination, days) as PriceHistoryEntry[]
+}
+
+export function getRoutePriceHistory(days: number = 30): PriceHistoryEntry[] {
+  const stmt = db.prepare(`
+    SELECT * FROM price_history 
+    WHERE recorded_at >= datetime('now', '-' || ? || ' days')
+    ORDER BY recorded_at ASC
+  `)
+  return stmt.all(days) as PriceHistoryEntry[]
 }
 
 function parseRow(row: any): SavedSearch {

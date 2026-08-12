@@ -42,3 +42,27 @@ export async function cancelSearch(searchId: string): Promise<void> {
 export function createSearchStream(searchId: string): EventSource {
   return new EventSource(`${API_BASE}/search/${searchId}/stream`)
 }
+
+export interface PriceHistoryEntry {
+  id: number
+  origin: string
+  destination: string
+  departure_date: string
+  return_date: string | null
+  min_price: number
+  avg_price: number
+  currency: string
+  recorded_at: string
+}
+
+export async function getPriceHistory(
+  origin?: string,
+  destination?: string,
+  days: number = 30
+): Promise<PriceHistoryEntry[]> {
+  const params = new URLSearchParams()
+  if (origin) params.set('origin', origin)
+  if (destination) params.set('destination', destination)
+  params.set('days', days.toString())
+  return fetchJson<PriceHistoryEntry[]>(`/price-history?${params.toString()}`)
+}

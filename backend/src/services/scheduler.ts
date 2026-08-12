@@ -1,4 +1,4 @@
-import { getSavedSearches, recordNotification } from './database.js'
+import { getSavedSearches, recordNotification, recordPriceHistory } from './database.js'
 import { RyanairAdapter } from '../adapters/ryanair/index.js'
 import { sendFlightAlert } from './ntfy.js'
 import { buildBookingUrl } from './search.js'
@@ -162,6 +162,26 @@ async function processSavedSearch(search: any): Promise<void> {
   if (topDeals.length === 0) {
     logger.info({ searchId: search.id }, 'No deals found within price range')
     return
+  }
+  
+  // Record price history for this route
+  try {
+    const priceHistoryEntries = bestDeals.map(deal => ({
+      origin: deal.origin,
+      destination: deal.destination,
+      departure_date: deal.departureDate,
+      return_date: deal.returnDate,
+      min_price: deal.price,
+      avg_price: deal.price,
+      currency: search.currency
+    }))
+    
+    if (priceHistoryEntries.length > 0) {
+      recordPriceHistory(priceHistoryEntries)
+      logger.info({ searchId: search.id, entries: priceHistoryEntries.length }, 'Recorded price history')
+    }
+  } catch (err: any) {
+    logger.error({ searchId: search.id, error: err.message }, 'Failed to record price history')
   }
   
   // Send notifications for top deals

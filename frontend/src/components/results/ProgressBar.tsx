@@ -31,8 +31,8 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ progress, onCancel }) 
   return (
     <div className="relative overflow-hidden rounded-2xl">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl"></div>
-      <div className="absolute inset-0 border border-white/10 rounded-2xl"></div>
+      <div className="absolute inset-0 dark:from-gray-900/95 dark:to-gray-800/95 from-white to-gray-50 backdrop-blur-xl"></div>
+      <div className="absolute inset-0 border dark:border-white/10 border-gray-200 rounded-2xl"></div>
       
       <div className="relative p-6 space-y-4">
         {/* Header */}
@@ -59,9 +59,9 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ progress, onCancel }) 
 
         {/* Progress info */}
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-400">
-            <span className="text-white font-medium">{progress.processedCombinations}</span>
-            <span className="text-gray-500"> / {progress.totalCombinations} combinazioni</span>
+          <span className="dark:text-gray-400 text-gray-600">
+            <span className="dark:text-white text-gray-900 font-medium">{progress.processedCombinations}</span>
+            <span className="dark:text-gray-500 text-gray-500"> / {progress.totalCombinations} combinazioni</span>
           </span>
           <span className="text-ryanair-yellow font-mono font-bold text-lg">
             {percentage}%
@@ -69,7 +69,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ progress, onCancel }) 
         </div>
 
         {/* Progress bar */}
-        <div className="relative h-3 bg-gray-800/50 rounded-full overflow-hidden">
+        <div className="relative h-3 dark:bg-gray-800/50 bg-gray-200 rounded-full overflow-hidden">
           {/* Background pattern */}
           <div className="absolute inset-0 opacity-20">
             <div className="h-full w-full" style={{
@@ -96,7 +96,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ progress, onCancel }) 
               </svg>
             </div>
             <div>
-              <div className="text-xs text-gray-500">Miglior prezzo trovato</div>
+              <div className="text-xs dark:text-gray-500 text-gray-500">Miglior prezzo trovato</div>
               <div className="text-xl font-bold text-gradient">
                 {progress.bestPrice.toFixed(2)} {progress.bestResult?.currency || 'EUR'}
               </div>
@@ -110,7 +110,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ progress, onCancel }) 
             <svg className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
             </svg>
-            <p className="text-sm text-red-300">{progress.error}</p>
+            <p className="text-sm dark:text-red-300 text-red-600">{progress.error}</p>
           </div>
         )}
       </div>

@@ -5,12 +5,22 @@ import { SavedSearches } from './components/search/SavedSearches'
 import { ProgressBar } from './components/results/ProgressBar'
 import { ResultsList } from './components/results/ResultsList'
 import { PriceChart } from './components/charts/PriceChart'
+import { PriceCalendar } from './components/charts/PriceCalendar'
+import { FlightMap } from './components/charts/FlightMap'
+import { PriceHistoryChart } from './components/charts/PriceHistoryChart'
+import { ExportCSV } from './components/results/ExportCSV'
+import { ShareResults } from './components/results/ShareResults'
 import { useSearch } from './hooks/useSearch'
+import { useTheme } from './hooks/useTheme'
 
 const App: React.FC = () => {
   const { search, cancel, progress, results, isSearching, error } = useSearch()
+  const { theme, toggleTheme } = useTheme()
   const [lastRequest, setLastRequest] = useState<SearchRequest | null>(null)
   const [showChart, setShowChart] = useState(false)
+  const [showCalendar, setShowCalendar] = useState(false)
+  const [showMap, setShowMap] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
 
   const handleSearch = useCallback((request: SearchRequest) => {
     setLastRequest(request)
@@ -26,7 +36,7 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Header con gradiente */}
-      <header className="sticky top-0 z-40 glass-effect border-b border-white/10">
+      <header className="sticky top-0 z-40 glass-effect border-b dark:border-white/10 border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             {/* Logo animato */}
@@ -43,7 +53,7 @@ const App: React.FC = () => {
               <h1 className="text-xl font-bold text-gradient">
                 Scanner Voli Ryanair
               </h1>
-              <p className="text-xs text-gray-400 mt-0.5">
+              <p className="text-xs dark:text-gray-400 text-gray-600 mt-0.5">
                 Trova le combinazioni di date più economiche
               </p>
             </div>
@@ -57,6 +67,23 @@ const App: React.FC = () => {
                 </span>
               </div>
             )}
+
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              className="button-secondary p-2 rounded-xl"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? (
+                <svg className="w-5 h-5 text-ryanair-yellow" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd"/>
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                </svg>
+              )}
+            </button>
           </div>
         </div>
       </header>
@@ -83,7 +110,7 @@ const App: React.FC = () => {
               </div>
               <div>
                 <p className="text-sm font-medium text-red-400">Errore</p>
-                <p className="text-sm text-red-300/80 mt-1">{error}</p>
+                <p className="text-sm dark:text-red-300/80 text-red-600 mt-1">{error}</p>
               </div>
             </div>
           </div>
@@ -99,23 +126,78 @@ const App: React.FC = () => {
         {/* Risultati */}
         {results.length > 0 && (
           <div className="space-y-6 animate-fade-in">
-            {/* Toggle grafico */}
-            <div className="flex items-center justify-between">
+            {/* Toggle viste e azioni */}
+            <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={() => setShowChart(!showChart)}
-                className="button-secondary px-4 py-2 rounded-xl text-sm text-gray-300 flex items-center gap-2"
+                className={`button-secondary px-4 py-2 rounded-xl text-sm flex items-center gap-2 ${showChart ? 'border-ryanair-yellow/50 text-ryanair-yellow' : 'dark:text-gray-300 text-gray-700'}`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
-                {showChart ? 'Nascondi grafico' : 'Mostra grafico prezzi'}
+                Grafico
               </button>
+              <button
+                onClick={() => setShowCalendar(!showCalendar)}
+                className={`button-secondary px-4 py-2 rounded-xl text-sm flex items-center gap-2 ${showCalendar ? 'border-ryanair-yellow/50 text-ryanair-yellow' : 'dark:text-gray-300 text-gray-700'}`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Calendario
+              </button>
+              <button
+                onClick={() => setShowMap(!showMap)}
+                className={`button-secondary px-4 py-2 rounded-xl text-sm flex items-center gap-2 ${showMap ? 'border-ryanair-yellow/50 text-ryanair-yellow' : 'dark:text-gray-300 text-gray-700'}`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Mappa
+              </button>
+              <button
+                onClick={() => setShowHistory(!showHistory)}
+                className={`button-secondary px-4 py-2 rounded-xl text-sm flex items-center gap-2 ${showHistory ? 'border-ryanair-yellow/50 text-ryanair-yellow' : 'dark:text-gray-300 text-gray-700'}`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                Storico
+              </button>
+              <div className="flex-1"></div>
+              <ExportCSV results={results} />
+              <ShareResults request={lastRequest} />
             </div>
 
             {/* Grafico */}
             {showChart && (
               <div className="animate-slide-up">
                 <PriceChart results={results} />
+              </div>
+            )}
+
+            {/* Calendario */}
+            {showCalendar && (
+              <div className="animate-slide-up">
+                <PriceCalendar results={results} />
+              </div>
+            )}
+
+            {/* Mappa */}
+            {showMap && (
+              <div className="animate-slide-up">
+                <FlightMap results={results} />
+              </div>
+            )}
+
+            {/* Storico prezzi */}
+            {showHistory && (
+              <div className="animate-slide-up">
+                <PriceHistoryChart
+                  origin={lastRequest?.origins[0]}
+                  destination={lastRequest?.destinations[0]}
+                  days={30}
+                />
               </div>
             )}
 
@@ -126,19 +208,19 @@ const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 mt-16">
+      <footer className="border-t dark:border-white/5 border-gray-200 mt-16">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-xs text-gray-500">
+            <div className="flex items-center gap-2 text-xs dark:text-gray-500 text-gray-500">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/>
               </svg>
               <span>Strumento non ufficiale. Non affiliato con Ryanair.</span>
             </div>
-            <div className="flex items-center gap-4 text-xs text-gray-500">
+            <div className="flex items-center gap-4 text-xs dark:text-gray-500 text-gray-500">
               <span>I prezzi possono cambiare</span>
               <span className="hidden sm:inline">•</span>
-              <a href="https://github.com/2BAD/ryanair" target="_blank" rel="noopener noreferrer" className="hover:text-ryanair-yellow transition-colors">
+              <a href="https://github.com/2BAD/ryanair" target="_blank" rel="noopener noreferrer" className="dark:hover:text-ryanair-yellow hover:text-ryanair-yellow transition-colors">
                 Powered by @2bad/ryanair
               </a>
             </div>

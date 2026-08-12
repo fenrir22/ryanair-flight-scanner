@@ -3,6 +3,7 @@ import { RyanairAdapter } from '../adapters/ryanair/index.js'
 import { startSearch, getSearch, cancelSearch } from '../services/scanner.js'
 import { SearchRequestSchema } from '../types/index.js'
 import { logger } from '../logger.js'
+import { getPriceHistory, getRoutePriceHistory } from '../services/database.js'
 
 export async function registerRoutes(app: FastifyInstance): Promise<void> {
   app.get('/api/health', async () => {
@@ -130,5 +131,16 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
     }
 
     return { success: true }
+  })
+
+  app.get('/api/price-history', async (request: FastifyRequest) => {
+    const { origin, destination, days } = request.query as { origin?: string; destination?: string; days?: string }
+    const daysNum = days ? parseInt(days, 10) : 30
+
+    if (origin && destination) {
+      return getPriceHistory(origin.toUpperCase(), destination.toUpperCase(), daysNum)
+    }
+
+    return getRoutePriceHistory(daysNum)
   })
 }

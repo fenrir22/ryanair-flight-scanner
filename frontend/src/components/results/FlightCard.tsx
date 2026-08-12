@@ -39,8 +39,8 @@ export const FlightCard: React.FC<FlightCardProps> = ({ result, rank }) => {
       rank === 1 ? 'ring-2 ring-ryanair-yellow/50 shadow-glow' : ''
     }`}>
       {/* Background gradiente */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl"></div>
-      <div className="absolute inset-0 border border-white/10 rounded-2xl group-hover:border-ryanair-yellow/20 transition-colors"></div>
+      <div className="absolute inset-0 dark:from-gray-900/95 dark:to-gray-800/95 from-white to-gray-50 backdrop-blur-xl"></div>
+      <div className="absolute inset-0 border dark:border-white/10 border-gray-200 rounded-2xl group-hover:border-ryanair-yellow/20 transition-colors"></div>
       
       {/* Badge miglior prezzo */}
       {rank === 1 && (
@@ -70,7 +70,7 @@ export const FlightCard: React.FC<FlightCardProps> = ({ result, rank }) => {
             </div>
             <div className="flex items-center gap-1">
               <div className="w-8 h-px bg-gradient-to-r from-green-500/50 to-red-500/50"></div>
-              <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-4 h-4 dark:text-gray-500 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd"/>
               </svg>
               <div className="w-8 h-px bg-gradient-to-r from-red-500/50 to-green-500/50"></div>
@@ -85,21 +85,21 @@ export const FlightCard: React.FC<FlightCardProps> = ({ result, rank }) => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div>
-              <div className="text-lg font-bold text-white">{formatDate(result.departureDate)}</div>
-              <div className="text-xs text-gray-500">Partenza</div>
+              <div className="text-lg font-bold dark:text-white text-gray-900">{formatDate(result.departureDate)}</div>
+              <div className="text-xs dark:text-gray-500 text-gray-500">Partenza</div>
             </div>
             {!isOneWay && result.returnDate && (
               <>
                 <div className="flex flex-col items-center">
-                  <div className="text-xs text-gray-500">{result.duration} notti</div>
-                  <div className="w-16 h-px bg-gray-700 my-1"></div>
-                  <svg className="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="text-xs dark:text-gray-500 text-gray-500">{result.duration} notti</div>
+                  <div className="w-16 h-px dark:bg-gray-700 bg-gray-300 my-1"></div>
+                  <svg className="w-3 h-3 dark:text-gray-600 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                   </svg>
                 </div>
                 <div>
-                  <div className="text-lg font-bold text-white">{formatDate(result.returnDate)}</div>
-                  <div className="text-xs text-gray-500">Ritorno</div>
+                  <div className="text-lg font-bold dark:text-white text-gray-900">{formatDate(result.returnDate)}</div>
+                  <div className="text-xs dark:text-gray-500 text-gray-500">Ritorno</div>
                 </div>
               </>
             )}
@@ -109,21 +109,21 @@ export const FlightCard: React.FC<FlightCardProps> = ({ result, rank }) => {
         {/* Dettagli volo */}
         <div className="flex flex-wrap gap-3 mb-4 text-xs">
           {result.outboundFlightNumber && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-800/50 rounded-lg">
-              <svg className="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 dark:bg-gray-800/50 bg-gray-100 rounded-lg">
+              <svg className="w-3 h-3 dark:text-gray-500 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
-              <span className="text-gray-400">Andata: {result.outboundFlightNumber}</span>
-              <span className="text-gray-500">{formatTime(result.outboundDepartureTime)}-{formatTime(result.outboundArrivalTime)}</span>
+              <span className="dark:text-gray-400 text-gray-600">Andata: {result.outboundFlightNumber}</span>
+              <span className="dark:text-gray-500 text-gray-500">{formatTime(result.outboundDepartureTime)}-{formatTime(result.outboundArrivalTime)}</span>
             </div>
           )}
           {!isOneWay && result.returnFlightNumber && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-800/50 rounded-lg">
-              <svg className="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 dark:bg-gray-800/50 bg-gray-100 rounded-lg">
+              <svg className="w-3 h-3 dark:text-gray-500 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
-              <span className="text-gray-400">Ritorno: {result.returnFlightNumber}</span>
-              <span className="text-gray-500">{formatTime(result.returnDepartureTime)}-{formatTime(result.returnArrivalTime)}</span>
+              <span className="dark:text-gray-400 text-gray-600">Ritorno: {result.returnFlightNumber}</span>
+              <span className="dark:text-gray-500 text-gray-500">{formatTime(result.returnDepartureTime)}-{formatTime(result.returnArrivalTime)}</span>
             </div>
           )}
           {result.outboundFareType && (
@@ -134,15 +134,15 @@ export const FlightCard: React.FC<FlightCardProps> = ({ result, rank }) => {
         </div>
 
         {/* Prezzo e azione */}
-        <div className="flex items-center justify-between pt-4 border-t border-white/5">
+        <div className="flex items-center justify-between pt-4 border-t dark:border-white/5 border-gray-200">
           <div>
             <div className="flex items-baseline gap-1">
               <span className="text-3xl font-bold text-gradient">{currencySymbol}{result.totalPrice?.toFixed(2)}</span>
             </div>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs text-gray-500">{result.passengers} pers.</span>
-              <span className="text-xs text-gray-600">•</span>
-              <span className="text-xs text-gray-500">Verificato: {formatVerifiedAt(result.verifiedAt)}</span>
+              <span className="text-xs dark:text-gray-500 text-gray-500">{result.passengers} pers.</span>
+              <span className="text-xs dark:text-gray-600 text-gray-400">•</span>
+              <span className="text-xs dark:text-gray-500 text-gray-500">Verificato: {formatVerifiedAt(result.verifiedAt)}</span>
             </div>
           </div>
           
@@ -151,7 +151,7 @@ export const FlightCard: React.FC<FlightCardProps> = ({ result, rank }) => {
               href={result.bookingUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="button-secondary px-4 py-2 rounded-xl text-sm text-gray-300 flex items-center gap-2 hover:text-ryanair-yellow"
+              className="button-secondary px-4 py-2 rounded-xl text-sm dark:text-gray-300 text-gray-700 flex items-center gap-2 hover:text-ryanair-yellow"
             >
               Prenota
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

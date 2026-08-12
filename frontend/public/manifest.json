@@ -1,0 +1,20 @@
+{
+  "name": "Scanner Voli Ryanair",
+  "short_name": "Ryanair Scanner",
+  "description": "Trova le combinazioni di date più economiche per i voli Ryanair",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c1f3d",
+  "theme_color": "#ffb71b",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["travel", "utilities"],
+  "lang": "it"
+}

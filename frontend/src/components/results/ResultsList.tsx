@@ -15,6 +15,7 @@ interface Filters {
   departureDay: string | null
   returnDay: string | null
   departureTime: string | null
+  fareType: string | null
   priority: 'total_price' | 'price_per_day'
 }
 
@@ -30,6 +31,7 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
     departureDay: null,
     returnDay: null,
     departureTime: null,
+    fareType: null,
     priority: 'total_price'
   })
 
@@ -107,6 +109,15 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
       })
     }
 
+    // Filtro tipo tariffa (bagagli)
+    if (filters.fareType) {
+      filtered = filtered.filter(r => {
+        const outboundMatch = !r.outboundFareType || r.outboundFareType.toLowerCase().includes(filters.fareType!.toLowerCase())
+        const returnMatch = !r.returnFareType || r.returnFareType.toLowerCase().includes(filters.fareType!.toLowerCase())
+        return outboundMatch && returnMatch
+      })
+    }
+
     // Ordinamento
     const sorted = [...filtered].sort((a, b) => {
       switch (sortBy) {
@@ -149,6 +160,7 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
       departureDay: null,
       returnDay: null,
       departureTime: null,
+      fareType: null,
       priority: 'total_price'
     })
     setFilterAirport('')
@@ -163,6 +175,7 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
     if (filters.departureDay) count++
     if (filters.returnDay) count++
     if (filters.departureTime) count++
+    if (filters.fareType) count++
     if (filterAirport) count++
     return count
   }, [filters, filterAirport])
@@ -171,8 +184,8 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
     <div className="space-y-6">
       {/* Header con controlli */}
       <div className="relative overflow-hidden rounded-2xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl"></div>
-        <div className="absolute inset-0 border border-white/10 rounded-2xl"></div>
+        <div className="absolute inset-0 dark:from-gray-900/95 dark:to-gray-800/95 from-white to-gray-50 backdrop-blur-xl"></div>
+        <div className="absolute inset-0 border dark:border-white/10 border-gray-200 rounded-2xl"></div>
         
         <div className="relative p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3 flex-wrap">
@@ -182,14 +195,14 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold dark:text-white text-gray-900">
                 {filteredAndSorted.length} risultati
               </h3>
             </div>
             
             <button
               onClick={onRefresh}
-              className="button-secondary px-3 py-1.5 rounded-lg text-sm text-gray-300 flex items-center gap-2"
+              className="button-secondary px-3 py-1.5 rounded-lg text-sm dark:text-gray-300 text-gray-700 flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
@@ -199,7 +212,7 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
             
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="button-secondary px-3 py-1.5 rounded-lg text-sm text-gray-300 flex items-center gap-2 relative"
+              className="button-secondary px-3 py-1.5 rounded-lg text-sm dark:text-gray-300 text-gray-700 flex items-center gap-2 relative"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
@@ -226,7 +239,7 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="input-modern flex-1 sm:flex-none px-3 py-2 rounded-lg text-gray-100 text-sm"
+              className="input-modern flex-1 sm:flex-none px-3 py-2 rounded-lg text-sm"
             >
               <option value="cheapest">Prezzo: più basso</option>
               <option value="most_expensive">Prezzo: più alto</option>
@@ -244,21 +257,21 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
       {/* Filtri avanzati */}
       {showFilters && (
         <div className="relative overflow-hidden rounded-2xl animate-slide-up">
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl"></div>
-          <div className="absolute inset-0 border border-white/10 rounded-2xl"></div>
+          <div className="absolute inset-0 dark:from-gray-900/95 dark:to-gray-800/95 from-white to-gray-50 backdrop-blur-xl"></div>
+          <div className="absolute inset-0 border dark:border-white/10 border-gray-200 rounded-2xl"></div>
           
           <div className="relative p-6 space-y-6">
             <div className="flex items-center gap-2">
               <svg className="w-5 h-5 text-ryanair-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
               </svg>
-              <h4 className="text-lg font-semibold text-white">Filtri avanzati</h4>
+              <h4 className="text-lg font-semibold dark:text-white text-gray-900">Filtri avanzati</h4>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Filtro prezzo */}
               <div className="space-y-3">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-400">
+                <label className="flex items-center gap-2 text-sm font-medium dark:text-gray-400 text-gray-600">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
@@ -270,21 +283,21 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
                     placeholder="Min"
                     value={filters.priceMin || ''}
                     onChange={(e) => setFilters({ ...filters, priceMin: e.target.value ? parseFloat(e.target.value) : null })}
-                    className="input-modern w-full px-3 py-2 rounded-lg text-gray-100 text-sm"
+                    className="input-modern w-full px-3 py-2 rounded-lg text-sm"
                   />
                   <input
                     type="number"
                     placeholder="Max"
                     value={filters.priceMax || ''}
                     onChange={(e) => setFilters({ ...filters, priceMax: e.target.value ? parseFloat(e.target.value) : null })}
-                    className="input-modern w-full px-3 py-2 rounded-lg text-gray-100 text-sm"
+                    className="input-modern w-full px-3 py-2 rounded-lg text-sm"
                   />
                 </div>
               </div>
 
               {/* Filtro durata */}
               <div className="space-y-3">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-400">
+                <label className="flex items-center gap-2 text-sm font-medium dark:text-gray-400 text-gray-600">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
@@ -296,21 +309,21 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
                     placeholder="Min"
                     value={filters.durationMin || ''}
                     onChange={(e) => setFilters({ ...filters, durationMin: e.target.value ? parseInt(e.target.value) : null })}
-                    className="input-modern w-full px-3 py-2 rounded-lg text-gray-100 text-sm"
+                    className="input-modern w-full px-3 py-2 rounded-lg text-sm"
                   />
                   <input
                     type="number"
                     placeholder="Max"
                     value={filters.durationMax || ''}
                     onChange={(e) => setFilters({ ...filters, durationMax: e.target.value ? parseInt(e.target.value) : null })}
-                    className="input-modern w-full px-3 py-2 rounded-lg text-gray-100 text-sm"
+                    className="input-modern w-full px-3 py-2 rounded-lg text-sm"
                   />
                 </div>
               </div>
 
               {/* Filtro aeroporto */}
               <div className="space-y-3">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-400">
+                <label className="flex items-center gap-2 text-sm font-medium dark:text-gray-400 text-gray-600">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -320,7 +333,7 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
                 <select
                   value={filterAirport}
                   onChange={(e) => setFilterAirport(e.target.value)}
-                  className="input-modern w-full px-3 py-2 rounded-lg text-gray-100 text-sm"
+                  className="input-modern w-full px-3 py-2 rounded-lg text-sm"
                 >
                   <option value="">Tutti gli aeroporti</option>
                   {airports.map(a => (
@@ -331,7 +344,7 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
 
               {/* Filtro giorno partenza */}
               <div className="space-y-3">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-400">
+                <label className="flex items-center gap-2 text-sm font-medium dark:text-gray-400 text-gray-600">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                   </svg>
@@ -340,7 +353,7 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
                 <select
                   value={filters.departureDay || ''}
                   onChange={(e) => setFilters({ ...filters, departureDay: e.target.value || null })}
-                  className="input-modern w-full px-3 py-2 rounded-lg text-gray-100 text-sm"
+                  className="input-modern w-full px-3 py-2 rounded-lg text-sm"
                 >
                   <option value="">Qualsiasi giorno</option>
                   <option value="lun">Lunedì</option>
@@ -355,7 +368,7 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
 
               {/* Filtro giorno ritorno */}
               <div className="space-y-3">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-400">
+                <label className="flex items-center gap-2 text-sm font-medium dark:text-gray-400 text-gray-600">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                   </svg>
@@ -364,7 +377,7 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
                 <select
                   value={filters.returnDay || ''}
                   onChange={(e) => setFilters({ ...filters, returnDay: e.target.value || null })}
-                  className="input-modern w-full px-3 py-2 rounded-lg text-gray-100 text-sm"
+                  className="input-modern w-full px-3 py-2 rounded-lg text-sm"
                 >
                   <option value="">Qualsiasi giorno</option>
                   <option value="lun">Lunedì</option>
@@ -379,7 +392,7 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
 
               {/* Filtro orario partenza */}
               <div className="space-y-3">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-400">
+                <label className="flex items-center gap-2 text-sm font-medium dark:text-gray-400 text-gray-600">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
@@ -388,13 +401,35 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
                 <select
                   value={filters.departureTime || ''}
                   onChange={(e) => setFilters({ ...filters, departureTime: e.target.value || null })}
-                  className="input-modern w-full px-3 py-2 rounded-lg text-gray-100 text-sm"
+                  className="input-modern w-full px-3 py-2 rounded-lg text-sm"
                 >
                   <option value="">Qualsiasi orario</option>
                   <option value="morning">Mattina (05:00-12:00)</option>
                   <option value="afternoon">Pomeriggio (12:00-18:00)</option>
                   <option value="evening">Sera (18:00-22:00)</option>
                   <option value="night">Notte (22:00-05:00)</option>
+                </select>
+              </div>
+
+              {/* Filtro tipo tariffa (bagagli) */}
+              <div className="space-y-3">
+                <label className="flex items-center gap-2 text-sm font-medium dark:text-gray-400 text-gray-600">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                  </svg>
+                  Tipo tariffa / Bagagli
+                </label>
+                <select
+                  value={filters.fareType || ''}
+                  onChange={(e) => setFilters({ ...filters, fareType: e.target.value || null })}
+                  className="input-modern w-full px-3 py-2 rounded-lg text-sm"
+                >
+                  <option value="">Qualsiasi tariffa</option>
+                  <option value="value">Value (solo bagaglio a mano piccolo)</option>
+                  <option value="regular">Regular (10kg bagaglio a mano + stiva)</option>
+                  <option value="plus">Plus (2 bagagli da stiva)</option>
+                  <option value="flex">Flex (prioritario + 2 bagagli)</option>
+                  <option value="family">Family (tariffa familiare)</option>
                 </select>
               </div>
             </div>
@@ -424,17 +459,17 @@ export const ResultsList: React.FC<ResultsListProps> = ({ results, onRefresh }) 
       {/* Nessun risultato */}
       {filteredAndSorted.length === 0 && (
         <div className="relative overflow-hidden rounded-2xl">
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl"></div>
-          <div className="absolute inset-0 border border-white/10 rounded-2xl"></div>
+          <div className="absolute inset-0 dark:from-gray-900/95 dark:to-gray-800/95 from-white to-gray-50 backdrop-blur-xl"></div>
+          <div className="absolute inset-0 border dark:border-white/10 border-gray-200 rounded-2xl"></div>
           
           <div className="relative py-16 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800/50 flex items-center justify-center">
-              <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full dark:bg-gray-800/50 bg-gray-100 flex items-center justify-center">
+              <svg className="w-8 h-8 dark:text-gray-600 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
             </div>
-            <p className="text-gray-400">Nessun risultato trovato con i filtri selezionati</p>
-            <p className="text-gray-600 text-sm mt-2">Prova a modificare i criteri di ricerca</p>
+            <p className="dark:text-gray-400 text-gray-600">Nessun risultato trovato con i filtri selezionati</p>
+            <p className="dark:text-gray-600 text-gray-400 text-sm mt-2">Prova a modificare i criteri di ricerca</p>
           </div>
         </div>
       )}
