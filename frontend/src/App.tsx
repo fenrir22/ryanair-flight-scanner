@@ -61,28 +61,6 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Hero section quando non ci sono risultati */}
-      {results.length === 0 && !progress && (
-        <div className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-ryanair-blue/10 to-transparent"></div>
-          <div className="relative max-w-7xl mx-auto px-4 py-12 text-center">
-            <div className="animate-float inline-block mb-6">
-              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-ryanair-yellow/20 to-ryanair-blue/20 rounded-full flex items-center justify-center">
-                <svg className="w-10 h-10 text-ryanair-yellow" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
-                </svg>
-              </div>
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-2">
-              Inizia a risparmiare sui tuoi voli
-            </h2>
-            <p className="text-gray-400 max-w-md mx-auto">
-              Cerca tra migliaia di combinazioni di date e trova il volo perfetto al prezzo migliore
-            </p>
-          </div>
-        </div>
-      )}
-
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
         {/* Form di ricerca */}
         <div className="animate-fade-in">
