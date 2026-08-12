@@ -37,6 +37,22 @@ Browser :8080
 | Proxy | Nginx 1.27 |
 | Deployment | Docker, Docker Compose |
 
+## Quick Start
+
+Per avviare rapidamente l'applicazione, copia e incolla questo comando:
+
+```bash
+curl -O https://raw.githubusercontent.com/fenrir22/ryanair-flight-scanner/master/docker-compose.quick.yml && docker compose -f docker-compose.quick.yml up -d
+```
+
+Oppure scarica manualmente il file `docker-compose.quick.yml` e avvia:
+
+```bash
+docker compose -f docker-compose.quick.yml up -d
+```
+
+L'applicazione sarà disponibile su http://localhost:8080
+
 ## Requirements
 
 - Docker >= 24
@@ -45,7 +61,7 @@ Browser :8080
 ## Installation
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/fenrir22/ryanair-flight-scanner.git
 cd ryanair-flight-scanner
 cp .env.example .env
 ```
