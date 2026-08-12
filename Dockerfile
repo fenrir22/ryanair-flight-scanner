@@ -1,6 +1,8 @@
 # Multi-stage build per Ryanair Flight Scanner
 FROM node:22-alpine AS backend-builder
 WORKDIR /app/backend
+# Installa dipendenze per compilare better-sqlite3
+RUN apk add --no-cache python3 make g++
 COPY backend/package*.json ./
 RUN npm ci
 COPY backend/ ./
@@ -15,6 +17,8 @@ RUN npm run build
 
 # Stage finale con nginx
 FROM nginx:alpine
+# Installa Node.js e dipendenze runtime per better-sqlite3
+RUN apk add --no-cache nodejs npm sqlite-libs
 # Copia il frontend buildato
 COPY --from=frontend-builder /app/frontend/dist /usr/share/nginx/html
 # Copia la configurazione nginx
