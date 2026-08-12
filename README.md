@@ -267,6 +267,12 @@ Methods used:
 
 **Note:** `flights.getAvailable()` is **not** used directly because the library hardcodes the `en-gb` market in the booking API URL. Instead, the adapter makes direct HTTP calls to `https://www.ryanair.com/api/booking/v4/{market}/availability` with the configurable market (default: `it-it`). The client-version header auto-refresh logic from the library is replicated in the adapter.
 
+## Credits
+
+This project is built on top of [@2bad/ryanair](https://github.com/2BAD/ryanair), an unofficial TypeScript client for the Ryanair API. Special thanks to the 2BAD team for creating and maintaining this excellent library.
+
+Original work: [2BAD/ryanair](https://github.com/2BAD/ryanair) - MIT License
+
 ## License
 
 MIT
