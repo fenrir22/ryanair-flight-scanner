@@ -26,12 +26,23 @@ export const AirportAutocomplete: React.FC<AirportAutocompleteProps> = ({
   placeholder = 'Cerca aeroporto...'
 }) => {
   const [isOpen, setIsOpen] = React.useState(false)
+  const inputRef = React.useRef<HTMLInputElement>(null)
+
+  // Placeholder dinamico
+  const dynamicPlaceholder = selected.length > 0 
+    ? 'Aggiungi un altro aeroporto...' 
+    : placeholder
 
   return (
     <div className="relative">
       <label className="flex items-center gap-2 text-sm font-medium text-gray-400 mb-2">
         {icon}
         {label}
+        {selected.length > 0 && (
+          <span className="text-xs text-ryanair-yellow/60">
+            ({selected.length} selezionat{selected.length === 1 ? 'o' : 'i'})
+          </span>
+        )}
       </label>
 
       {/* Tag aeroporti selezionati */}
@@ -46,6 +57,7 @@ export const AirportAutocomplete: React.FC<AirportAutocompleteProps> = ({
               <button
                 onClick={() => onRemove(code)}
                 className="text-gray-500 hover:text-red-400 transition-colors"
+                aria-label={`Rimuovi ${code}`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
@@ -59,6 +71,7 @@ export const AirportAutocomplete: React.FC<AirportAutocompleteProps> = ({
       {/* Input di ricerca */}
       <div className="relative">
         <input
+          ref={inputRef}
           type="text"
           value={searchQuery}
           onChange={(e) => {
@@ -67,7 +80,7 @@ export const AirportAutocomplete: React.FC<AirportAutocompleteProps> = ({
           }}
           onFocus={() => setIsOpen(true)}
           onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-          placeholder={placeholder}
+          placeholder={dynamicPlaceholder}
           className="input-modern w-full px-4 py-3 rounded-xl text-gray-100 placeholder-gray-500 text-sm"
         />
         {isSearching && (
@@ -95,7 +108,10 @@ export const AirportAutocomplete: React.FC<AirportAutocompleteProps> = ({
                 onClick={() => {
                   onAdd(airport.code)
                   setSearchQuery('')
-                  setIsOpen(false)
+                  // Mantieni il dropdown aperto e il focus sull'input
+                  setTimeout(() => {
+                    inputRef.current?.focus()
+                  }, 0)
                 }}
                 disabled={selected.includes(airport.code)}
                 className="w-full text-left px-4 py-3 hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed text-sm border-b border-white/5 last:border-0 transition-colors flex items-center gap-3"
