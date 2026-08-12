@@ -2,28 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+@layer base {
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    @apply bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950;
+    @apply text-gray-100;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    @apply transition-colors duration-200;
+  }
 }
 
+@layer components {
+  .glass-effect {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+
+  .card-hover-effect {
+    @apply transition-all duration-300 ease-out;
+    @apply hover:shadow-card-hover hover:-translate-y-1;
+  }
+
+  .button-primary {
+    @apply bg-gradient-to-r from-ryanair-yellow to-ryanair-light;
+    @apply text-ryanair-dark font-bold;
+    @apply hover:shadow-glow hover:scale-105;
+    @apply active:scale-95;
+    @apply transition-all duration-200;
+  }
+
+  .button-secondary {
+    @apply bg-gray-800/50 backdrop-blur-sm;
+    @apply border border-gray-700/50;
+    @apply hover:bg-gray-700/50 hover:border-gray-600/50;
+    @apply transition-all duration-200;
+  }
+
+  .input-modern {
+    @apply bg-gray-800/50 backdrop-blur-sm;
+    @apply border border-gray-700/50;
+    @apply focus:border-ryanair-yellow/50 focus:ring-2 focus:ring-ryanair-yellow/20;
+    @apply transition-all duration-200;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-ryanair-yellow to-ryanair-light;
+    @apply bg-clip-text text-transparent;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+}
+
+/* Scrollbar moderna */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1f2937;
+  @apply bg-gray-900/50;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #4b5563;
-  border-radius: 4px;
+  @apply bg-gradient-to-b from-ryanair-yellow/50 to-ryanair-blue/50;
+  @apply rounded-full;
+  @apply hover:from-ryanair-yellow/70 hover:to-ryanair-blue/70;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
-}
-
+/* Input date picker */
 input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
+  cursor: pointer;
+}
+
+/* Animazioni per le card */
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideInFromBottom 0.4s ease-out forwards;
+}
+
+/* Effetto glow per elementi importanti */
+.glow-effect {
+  box-shadow: 0 0 20px rgba(255, 183, 27, 0.3);
+  transition: box-shadow 0.3s ease;
+}
+
+.glow-effect:hover {
+  box-shadow: 0 0 30px rgba(255, 183, 27, 0.5);
 }

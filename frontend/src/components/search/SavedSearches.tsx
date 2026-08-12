@@ -67,12 +67,36 @@ export const SavedSearches: React.FC<SavedSearchesProps> = ({ userId }) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-100">Ricerche Salvate</h2>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-ryanair-yellow/10 flex items-center justify-center">
+            <svg className="w-5 h-5 text-ryanair-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white">Ricerche Salvate</h2>
+            <p className="text-xs text-gray-500">Ricevi notifiche per le migliori offerte</p>
+          </div>
+        </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-ryanair-yellow text-ryanair-dark font-bold rounded-lg hover:bg-yellow-400 transition-colors"
+          className="button-primary px-4 py-2 rounded-xl text-sm flex items-center gap-2"
         >
-          {showForm ? 'Annulla' : '+ Nuova Ricerca'}
+          {showForm ? (
+            <>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+              Annulla
+            </>
+          ) : (
+            <>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
+              </svg>
+              Nuova Ricerca
+            </>
+          )}
         </button>
       </div>
 
@@ -85,8 +109,19 @@ export const SavedSearches: React.FC<SavedSearchesProps> = ({ userId }) => {
       )}
 
       {searches.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          Nessuna ricerca salvata. Crea una nuova ricerca per ricevere notifiche giornaliere.
+        <div className="relative overflow-hidden rounded-2xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl"></div>
+          <div className="absolute inset-0 border border-white/10 rounded-2xl"></div>
+          
+          <div className="relative py-12 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800/50 flex items-center justify-center">
+              <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+              </svg>
+            </div>
+            <p className="text-gray-400">Nessuna ricerca salvata</p>
+            <p className="text-gray-600 text-sm mt-2">Crea una nuova ricerca per ricevere notifiche giornaliere</p>
+          </div>
         </div>
       ) : (
         <div className="grid gap-4">
@@ -112,58 +147,100 @@ interface SavedSearchCardProps {
 
 const SavedSearchCard: React.FC<SavedSearchCardProps> = ({ search, onDelete, onToggle }) => {
   return (
-    <div className={`bg-gray-900 rounded-xl border p-5 ${search.enabled ? 'border-gray-700' : 'border-gray-800 opacity-60'}`}>
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <h3 className="text-lg font-semibold text-gray-100">{search.name}</h3>
-            <span className={`px-2 py-0.5 text-xs rounded ${search.enabled ? 'bg-green-500/20 text-green-400' : 'bg-gray-700 text-gray-400'}`}>
-              {search.enabled ? 'Attiva' : 'Disattivata'}
-            </span>
+    <div className={`relative overflow-hidden rounded-2xl card-hover-effect ${!search.enabled && 'opacity-60'}`}>
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl"></div>
+      <div className={`absolute inset-0 border rounded-2xl transition-colors ${search.enabled ? 'border-white/10' : 'border-gray-800/50'}`}></div>
+      
+      <div className="relative p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-3">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${search.enabled ? 'bg-green-500/10' : 'bg-gray-800/50'}`}>
+                <svg className={`w-5 h-5 ${search.enabled ? 'text-green-400' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white">{search.name}</h3>
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full ${search.enabled ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-gray-800/50 text-gray-500 border border-gray-700/50'}`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${search.enabled ? 'bg-green-400 animate-pulse' : 'bg-gray-600'}`}></div>
+                  {search.enabled ? 'Attiva' : 'Disattivata'}
+                </span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              <div className="flex items-center gap-2 text-gray-400">
+                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                </svg>
+                <span>{search.origins.join(', ')} → {search.destinations.join(', ')}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-400">
+                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span>{search.departure_from} → {search.departure_to}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-400">
+                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>{search.min_stay}-{search.max_stay} giorni{search.trip_type === 'one-way' && ' (solo andata)'}</span>
+              </div>
+              {search.max_price && (
+                <div className="flex items-center gap-2 text-gray-400">
+                  <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <span>Max {search.max_price} {search.currency}</span>
+                </div>
+              )}
+              {search.ntfy_topic && (
+                <div className="flex items-center gap-2 text-gray-400">
+                  <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                  </svg>
+                  <span>{search.ntfy_topic}</span>
+                </div>
+              )}
+            </div>
           </div>
           
-          <div className="text-sm text-gray-400 space-y-1">
-            <div>
-              <span className="text-gray-500">Da:</span> {search.origins.join(', ')} → 
-              <span className="text-gray-500"> A:</span> {search.destinations.join(', ')}
-            </div>
-            <div>
-              <span className="text-gray-500">Date:</span> {search.departure_from} → {search.departure_to}
-            </div>
-            <div>
-              <span className="text-gray-500">Durata:</span> {search.min_stay}-{search.max_stay} giorni
-              {search.trip_type === 'one-way' && ' (solo andata)'}
-            </div>
-            {search.max_price && (
-              <div>
-                <span className="text-gray-500">Prezzo max:</span> {search.max_price} {search.currency}
-              </div>
-            )}
-            {search.ntfy_topic && (
-              <div>
-                <span className="text-gray-500">Notifiche:</span> {search.ntfy_topic}
-              </div>
-            )}
+          <div className="flex gap-2">
+            <button
+              onClick={onToggle}
+              className={`button-secondary px-3 py-1.5 rounded-lg text-sm flex items-center gap-2 ${
+                search.enabled ? 'text-orange-400 border-orange-500/20 hover:bg-orange-500/10' : 'text-green-400 border-green-500/20 hover:bg-green-500/10'
+              }`}
+            >
+              {search.enabled ? (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  Pausa
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                  </svg>
+                  Attiva
+                </>
+              )}
+            </button>
+            <button
+              onClick={onDelete}
+              className="button-secondary px-3 py-1.5 rounded-lg text-sm text-red-400 border-red-500/20 hover:bg-red-500/10 flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+              Elimina
+            </button>
           </div>
-        </div>
-        
-        <div className="flex gap-2">
-          <button
-            onClick={onToggle}
-            className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
-              search.enabled 
-                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
-                : 'bg-green-600/20 text-green-400 hover:bg-green-600/30'
-            }`}
-          >
-            {search.enabled ? 'Disattiva' : 'Attiva'}
-          </button>
-          <button
-            onClick={onDelete}
-            className="px-3 py-1.5 bg-red-600/20 text-red-400 text-sm rounded-lg hover:bg-red-600/30 transition-colors"
-          >
-            Elimina
-          </button>
         </div>
       </div>
     </div>
