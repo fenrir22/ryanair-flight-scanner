@@ -3,6 +3,7 @@ import { airports, fares, flights } from '@2bad/ryanair'
 import type { Airport, Fare, AvailabilityResponse } from '@2bad/ryanair'
 import type { AirportInfo } from '../../types/index.js'
 import { logger } from '../../logger.js'
+import { translateAirport } from './translations.js'
 
 const MARKET = process.env.MARKET || 'it-it'
 const BOOKING_API = `https://www.ryanair.com/api/booking/v4/${MARKET}`
@@ -68,13 +69,16 @@ export class RyanairAdapter {
     logger.info('Fetching active airports from Ryanair API')
     const data = await airports.getActive()
 
-    airportsCache = data.map((a: Airport) => ({
-      code: a.code,
-      name: a.name,
-      cityName: a.city.name,
-      countryCode: a.country.code,
-      aliases: a.aliases || []
-    }))
+    airportsCache = data.map((a: Airport) => {
+      const translated = translateAirport(a.code, a.name, a.city.name)
+      return {
+        code: a.code,
+        name: translated.name,
+        cityName: translated.cityName,
+        countryCode: a.country.code,
+        aliases: a.aliases || []
+      }
+    })
     airportsCacheTime = now
 
     logger.info(`Cached ${airportsCache.length} airports`)
