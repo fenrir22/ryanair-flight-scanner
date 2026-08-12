@@ -18,14 +18,13 @@ RUN npm run build
 # Stage finale con nginx
 FROM nginx:alpine
 # Installa Node.js e dipendenze runtime per better-sqlite3
-RUN apk add --no-cache nodejs npm sqlite-libs
+RUN apk add --no-cache nodejs sqlite-libs
 # Copia il frontend buildato
 COPY --from=frontend-builder /app/frontend/dist /usr/share/nginx/html
 # Copia la configurazione nginx
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
-# Copia il backend
+# Copia il backend con node_modules già compilati
 COPY --from=backend-builder /app/backend /app/backend
 WORKDIR /app/backend
-RUN npm ci --only=production
 EXPOSE 80
 CMD ["sh", "-c", "node dist/index.js & nginx -g 'daemon off;'"]
